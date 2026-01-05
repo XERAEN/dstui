@@ -1,6 +1,6 @@
-# DSTUI
+# dstui
 
-A web interface for [dstask](https://github.com/nagber/dstask), the personal task tracker with git sync.
+A web interface for [dstask](https://github.com/naggie/dstask), the personal task tracker with git sync.
 
 ## Features
 
@@ -13,7 +13,7 @@ A web interface for [dstask](https://github.com/nagber/dstask), the personal tas
 ## Requirements
 
 - Ruby 3.x
-- [dstask](https://github.com/nagber/dstask) installed and configured
+- [dstask](https://github.com/naggie/dstask) installed and configured
 - Bundler
 
 ## Installation
