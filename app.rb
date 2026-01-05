@@ -98,6 +98,7 @@ module Dstui
     get '/resolved' do
       @tasks = Dstask.resolved_tasks
       @projects = Dstask.projects rescue []
+      @all_tags = @tasks.flat_map { |t| t['tags'] || [] }.uniq.sort
       @view_title = 'Resolved Tasks'
       erb :tasks
     rescue Dstask::Error => e

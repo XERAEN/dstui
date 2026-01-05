@@ -2,7 +2,36 @@
   <fieldset class="dstui-panel-border">
     <legend class="center"><%= @view_title || 'TASKS' %></legend>
 
-    <% unless @view_title %>
+    <% if @view_title == 'Resolved Tasks' %>
+    <div class="runboard-filter-bar">
+      <div class="filter-group">
+        <label>Project:</label>
+        <select id="filter-project" class="tui-input">
+          <option value="">All</option>
+          <% (@projects || []).each do |p| %>
+            <option value="<%= h(p['name']) %>"><%= h(p['name']) %></option>
+          <% end %>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label>Tag:</label>
+        <select id="filter-tag" class="tui-input">
+          <option value="">All</option>
+          <% (@all_tags || []).each do |tag| %>
+            <option value="<%= h(tag) %>">+<%= h(tag) %></option>
+          <% end %>
+        </select>
+      </div>
+
+      <div class="filter-group filter-group-search">
+        <label>Search:</label>
+        <input type="text" id="filter-search" class="tui-input" placeholder="filter as you type...">
+      </div>
+
+      <button type="button" id="filter-clear" class="tui-button btn-muted-alt" style="align-self: flex-end;">Clear</button>
+    </div>
+    <% elsif !@view_title %>
     <form method="get" action="/" class="filter-bar">
       <div class="filter-group">
         <label>Project:</label>
@@ -54,9 +83,12 @@
               <th style="width: 200px;">Actions</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody id="task-table-body">
             <% @tasks.each do |task| %>
-              <tr class="<%= priority_class(task['priority']) %>">
+              <tr class="<%= priority_class(task['priority']) %>"
+                  data-project="<%= h(task['project'] || '') %>"
+                  data-tags="<%= (task['tags'] || []).join(',') %>"
+                  data-searchable="<%= h([task['id'], task['summary'], task['project'], (task['tags'] || []).join(' ')].compact.join(' ').downcase) %>">
                 <td class="task-id"><%= task['id'] %></td>
                 <td class="task-summary">
                   <%= h(task['summary']) %>
@@ -106,7 +138,64 @@
     <% end %>
 
     <div style="margin-top: 20px; color: #666;">
-      <%= @tasks.length %> task<%= @tasks.length == 1 ? '' : 's' %>
+      <% if @view_title == 'Resolved Tasks' %>
+        <span id="visible-count"><%= @tasks.length %></span> of
+        <span id="total-count"><%= @tasks.length %></span> resolved tasks
+      <% else %>
+        <%= @tasks.length %> task<%= @tasks.length == 1 ? '' : 's' %>
+      <% end %>
     </div>
   </fieldset>
 </div>
+
+<% if @view_title == 'Resolved Tasks' %>
+<script>
+(function() {
+  const filterProject = document.getElementById('filter-project');
+  const filterTag = document.getElementById('filter-tag');
+  const filterSearch = document.getElementById('filter-search');
+  const filterClear = document.getElementById('filter-clear');
+  const tableBody = document.getElementById('task-table-body');
+  const visibleCount = document.getElementById('visible-count');
+
+  function applyFilters() {
+    const projectFilter = filterProject.value.toLowerCase();
+    const tagFilter = filterTag.value.toLowerCase();
+    const searchFilter = filterSearch.value.toLowerCase();
+
+    const rows = tableBody.querySelectorAll('tr');
+    let visible = 0;
+
+    rows.forEach(row => {
+      const project = (row.dataset.project || '').toLowerCase();
+      const tags = (row.dataset.tags || '').toLowerCase().split(',');
+      const searchable = row.dataset.searchable || '';
+
+      const matchesProject = !projectFilter || project === projectFilter;
+      const matchesTag = !tagFilter || tags.includes(tagFilter);
+      const matchesSearch = !searchFilter || searchable.includes(searchFilter);
+
+      if (matchesProject && matchesTag && matchesSearch) {
+        row.style.display = '';
+        visible++;
+      } else {
+        row.style.display = 'none';
+      }
+    });
+
+    visibleCount.textContent = visible;
+  }
+
+  filterProject.addEventListener('change', applyFilters);
+  filterTag.addEventListener('change', applyFilters);
+  filterSearch.addEventListener('input', applyFilters);
+
+  filterClear.addEventListener('click', function() {
+    filterProject.value = '';
+    filterTag.value = '';
+    filterSearch.value = '';
+    applyFilters();
+  });
+})();
+</script>
+<% end %>

@@ -32,14 +32,6 @@ bin/run
 
 The server starts on `http://localhost:4567` by default.
 
-## Configuration
-
-Set the `SESSION_SECRET` environment variable for production deployments:
-
-```bash
-SESSION_SECRET=your-secret-here bin/run
-```
-
 ## Views
 
 | Route | Description |
