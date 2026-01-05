@@ -53,4 +53,4 @@ SESSION_SECRET=your-secret-here bin/run
 
 ## License
 
-MIT
+This project is released into the public domain under the [Unlicense](UNLICENSE).
