@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+cd "$(dirname "$0")/.."
+exec bundle exec rackup -o 0.0.0.0 -p "${PORT:-4567}"

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>dstui</title>
+  <link rel="stylesheet" href="/css/tuicss.css">
+  <link rel="stylesheet" href="/css/dstui.css">
+</head>
+<body class="black-168" style="background: #0a0a0a; min-height: 100vh;">
+  <div class="dstui-nav">
+    <div style="max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center;">
+      <div>
+        <span class="brand-text" style="font-weight: bold; font-size: 1.3em;">DSTUI</span>
+        <span style="color: #444; margin: 0 15px;">|</span>
+        <span style="color: #666;">dstask web interface</span>
+      </div>
+
+      <nav style="display: flex; gap: 25px; align-items: center;">
+        <a href="/" class="nav-link <%= active_nav?('/') && !active_nav?('/active') && !active_nav?('/resolved') && !active_nav?('/projects') && !active_nav?('/runboard') && !active_nav?('/tasks') ? 'active' : '' %>">Tasks</a>
+        <a href="/runboard" class="nav-link <%= active_nav?('/runboard') ? 'active' : '' %>">Runboard</a>
+        <a href="/active" class="nav-link <%= active_nav?('/active') ? 'active' : '' %>">Active</a>
+        <a href="/resolved" class="nav-link <%= active_nav?('/resolved') ? 'active' : '' %>">Resolved</a>
+        <a href="/projects" class="nav-link <%= active_nav?('/projects') ? 'active' : '' %>">Projects</a>
+        <a href="/tasks/new" class="tui-button btn-new" style="padding: 2px 10px;">+ New</a>
+      </nav>
+    </div>
+  </div>
+
+  <div class="main-container">
+    <% if (msg = get_flash(:success)) %>
+      <div class="flash-success">
+        <span class="flash-label">OK:</span> <%= h(msg) %>
+      </div>
+    <% end %>
+
+    <% if (msg = get_flash(:error)) %>
+      <div class="flash-error">
+        <span class="flash-label">ERR:</span> <%= h(msg) %>
+      </div>
+    <% end %>
+
+    <%= yield %>
+  </div>
+
+  <div style="text-align: center; padding: 30px; color: #444; font-size: 0.9em;">
+    dstui v0.1 | <span style="color: #555;">dstask web interface</span>
+  </div>
+</body>
+</html>

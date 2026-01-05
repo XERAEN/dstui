@@ -1,0 +1,140 @@
+<div class="tui-window white-text dstui-panel" style="padding: 20px;">
+  <fieldset class="dstui-panel-border">
+    <legend class="center">RUNBOARD</legend>
+
+    <div class="runboard-filter-bar">
+      <div class="filter-group">
+        <label>Project:</label>
+        <select id="filter-project" class="tui-input">
+          <option value="">All</option>
+          <% (@projects || []).each do |p| %>
+            <option value="<%= h(p['name']) %>"><%= h(p['name']) %></option>
+          <% end %>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label>Tag:</label>
+        <select id="filter-tag" class="tui-input">
+          <option value="">All</option>
+          <% (@all_tags || []).each do |tag| %>
+            <option value="<%= h(tag) %>">+<%= h(tag) %></option>
+          <% end %>
+        </select>
+      </div>
+
+      <div class="filter-group filter-group-search">
+        <label>Search:</label>
+        <input type="text" id="filter-search" class="tui-input" placeholder="filter as you type...">
+      </div>
+
+      <button type="button" id="filter-clear" class="tui-button btn-muted-alt" style="align-self: flex-end;">Clear</button>
+    </div>
+
+    <div class="runboard">
+      <div class="runboard-column" data-status="pending">
+        <div class="runboard-column-header">
+          <span class="column-title">Pending</span>
+          <span class="column-count"><%= @pending_tasks.length %></span>
+        </div>
+        <div class="runboard-tasks" id="pending-tasks">
+          <% @pending_tasks.each do |task| %>
+            <div class="runboard-card <%= priority_class(task['priority']) %>"
+                 data-task-id="<%= task['id'] %>"
+                 data-project="<%= h(task['project'] || '') %>"
+                 data-tags="<%= (task['tags'] || []).join(',') %>"
+                 data-searchable="<%= h([task['id'], task['summary'], task['project'], (task['tags'] || []).join(' ')].compact.join(' ').downcase) %>">
+              <div class="card-header">
+                <span class="card-id">#<%= task['id'] %></span>
+                <span class="card-priority"><%= task['priority'] %></span>
+              </div>
+              <div class="card-summary"><%= h(task['summary']) %></div>
+              <% if task['project'] && !task['project'].empty? %>
+                <div class="card-project"><%= h(task['project']) %></div>
+              <% end %>
+              <% if task['tags'] && !task['tags'].empty? %>
+                <div class="card-tags">
+                  <% task['tags'].each do |tag| %>
+                    <span class="tag">+<%= h(tag) %></span>
+                  <% end %>
+                </div>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <div class="runboard-column" data-status="active">
+        <div class="runboard-column-header status-active">
+          <span class="column-title">Active</span>
+          <span class="column-count"><%= @active_tasks.length %></span>
+        </div>
+        <div class="runboard-tasks" id="active-tasks">
+          <% @active_tasks.each do |task| %>
+            <div class="runboard-card <%= priority_class(task['priority']) %>"
+                 data-task-id="<%= task['id'] %>"
+                 data-project="<%= h(task['project'] || '') %>"
+                 data-tags="<%= (task['tags'] || []).join(',') %>"
+                 data-searchable="<%= h([task['id'], task['summary'], task['project'], (task['tags'] || []).join(' ')].compact.join(' ').downcase) %>">
+              <div class="card-header">
+                <span class="card-id">#<%= task['id'] %></span>
+                <span class="card-priority"><%= task['priority'] %></span>
+              </div>
+              <div class="card-summary"><%= h(task['summary']) %></div>
+              <% if task['project'] && !task['project'].empty? %>
+                <div class="card-project"><%= h(task['project']) %></div>
+              <% end %>
+              <% if task['tags'] && !task['tags'].empty? %>
+                <div class="card-tags">
+                  <% task['tags'].each do |tag| %>
+                    <span class="tag">+<%= h(tag) %></span>
+                  <% end %>
+                </div>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <div class="runboard-column" data-status="paused">
+        <div class="runboard-column-header status-paused">
+          <span class="column-title">Paused</span>
+          <span class="column-count"><%= @paused_tasks.length %></span>
+        </div>
+        <div class="runboard-tasks" id="paused-tasks">
+          <% @paused_tasks.each do |task| %>
+            <div class="runboard-card <%= priority_class(task['priority']) %>"
+                 data-task-id="<%= task['id'] %>"
+                 data-project="<%= h(task['project'] || '') %>"
+                 data-tags="<%= (task['tags'] || []).join(',') %>"
+                 data-searchable="<%= h([task['id'], task['summary'], task['project'], (task['tags'] || []).join(' ')].compact.join(' ').downcase) %>">
+              <div class="card-header">
+                <span class="card-id">#<%= task['id'] %></span>
+                <span class="card-priority"><%= task['priority'] %></span>
+              </div>
+              <div class="card-summary"><%= h(task['summary']) %></div>
+              <% if task['project'] && !task['project'].empty? %>
+                <div class="card-project"><%= h(task['project']) %></div>
+              <% end %>
+              <% if task['tags'] && !task['tags'].empty? %>
+                <div class="card-tags">
+                  <% task['tags'].each do |tag| %>
+                    <span class="tag">+<%= h(tag) %></span>
+                  <% end %>
+                </div>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <div class="runboard-status-bar">
+      <span id="visible-count"><%= @pending_tasks.length + @active_tasks.length + @paused_tasks.length %></span> of
+      <span id="total-count"><%= @pending_tasks.length + @active_tasks.length + @paused_tasks.length %></span> open tasks
+    </div>
+  </fieldset>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+<script src="/js/runboard.js"></script>

@@ -1,0 +1,112 @@
+<div class="tui-window white-text dstui-panel" style="padding: 20px;">
+  <fieldset class="dstui-panel-border">
+    <legend class="center"><%= @view_title || 'TASKS' %></legend>
+
+    <% unless @view_title %>
+    <form method="get" action="/" class="filter-bar">
+      <div class="filter-group">
+        <label>Project:</label>
+        <select name="project" class="tui-input" onchange="this.form.submit()">
+          <option value="">All</option>
+          <% (@projects || []).each do |p| %>
+            <option value="<%= h(p['name']) %>" <%= @current_project == p['name'] ? 'selected' : '' %>><%= h(p['name']) %></option>
+          <% end %>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label>Priority:</label>
+        <select name="priority" class="tui-input" onchange="this.form.submit()">
+          <option value="">All</option>
+          <option value="P0" <%= @current_priority == 'P0' ? 'selected' : '' %>>P0 (Critical)</option>
+          <option value="P1" <%= @current_priority == 'P1' ? 'selected' : '' %>>P1 (High)</option>
+          <option value="P2" <%= @current_priority == 'P2' ? 'selected' : '' %>>P2 (Normal)</option>
+          <option value="P3" <%= @current_priority == 'P3' ? 'selected' : '' %>>P3 (Low)</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label>Search:</label>
+        <input type="text" name="q" class="tui-input" value="<%= h(@current_query) %>" placeholder="search...">
+      </div>
+
+      <button type="submit" class="tui-button btn-muted">Filter</button>
+      <% if @current_project || @current_priority || @current_tag || @current_query %>
+        <a href="/" class="tui-button btn-muted-alt">Clear</a>
+      <% end %>
+    </form>
+    <% end %>
+
+    <% if @tasks.empty? %>
+      <div style="text-align: center; padding: 40px; color: #888;">
+        No tasks found
+      </div>
+    <% else %>
+      <div class="task-list">
+        <table class="tui-table">
+          <thead>
+            <tr>
+              <th style="width: 50px;">ID</th>
+              <th>Summary</th>
+              <th style="width: 120px;">Project</th>
+              <th style="width: 80px;">Priority</th>
+              <th style="width: 80px;">Status</th>
+              <th style="width: 200px;">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @tasks.each do |task| %>
+              <tr class="<%= priority_class(task['priority']) %>">
+                <td class="task-id"><%= task['id'] %></td>
+                <td class="task-summary">
+                  <%= h(task['summary']) %>
+                  <% if task['tags'] && !task['tags'].empty? %>
+                    <span class="task-tags">
+                      <% task['tags'].each do |tag| %>
+                        <span class="tag">+<%= h(tag) %></span>
+                      <% end %>
+                    </span>
+                  <% end %>
+                </td>
+                <td class="task-project"><%= h(task['project']) %></td>
+                <td class="task-priority"><%= task['priority'] %></td>
+                <td class="task-status <%= status_class(task['status']) %>"><%= task['status'] %></td>
+                <td class="task-actions">
+                  <% if task['status'] == 'pending' %>
+                    <form method="post" action="/tasks/<%= task['id'] %>/start" style="display: inline;">
+                      <button type="submit" class="tui-button btn-action-start btn-sm">Start</button>
+                    </form>
+                  <% elsif task['status'] == 'active' %>
+                    <form method="post" action="/tasks/<%= task['id'] %>/stop" style="display: inline;">
+                      <button type="submit" class="tui-button btn-action-stop btn-sm">Stop</button>
+                    </form>
+                  <% elsif task['status'] == 'paused' %>
+                    <form method="post" action="/tasks/<%= task['id'] %>/start" style="display: inline;">
+                      <button type="submit" class="tui-button btn-action-start btn-sm">Resume</button>
+                    </form>
+                  <% end %>
+
+                  <% unless task['status'] == 'resolved' %>
+                    <form method="post" action="/tasks/<%= task['id'] %>/done" style="display: inline;">
+                      <button type="submit" class="tui-button btn-action-done btn-sm">Done</button>
+                    </form>
+
+                    <a href="/tasks/<%= task['id'] %>/edit" class="tui-button btn-action-edit btn-sm">Edit</a>
+
+                    <form method="post" action="/tasks/<%= task['id'] %>/remove" style="display: inline;" onsubmit="return confirm('Remove task #<%= task['id'] %>?');">
+                      <button type="submit" class="tui-button btn-action-remove btn-sm">X</button>
+                    </form>
+                  <% end %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    <% end %>
+
+    <div style="margin-top: 20px; color: #666;">
+      <%= @tasks.length %> task<%= @tasks.length == 1 ? '' : 's' %>
+    </div>
+  </fieldset>
+</div>

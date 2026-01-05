@@ -1,0 +1,61 @@
+<div class="tui-window white-text dstui-panel-alt" style="padding: 20px;">
+  <fieldset class="dstui-panel-alt-border">
+    <legend class="center"><%= @is_new ? 'NEW TASK' : 'EDIT TASK' %></legend>
+
+    <form method="post" action="<%= @is_new ? '/tasks' : "/tasks/#{@task['id']}" %>">
+      <div class="form-group">
+        <label class="white-text">Summary</label>
+        <% if @is_new %>
+          <input type="text" name="summary" class="tui-input" value="<%= h(@task['summary']) %>" required placeholder="Task description with optional project:name +tags P1">
+          <small>Include project:name, +tags, and priority (P0-P3) inline, or use fields below</small>
+        <% else %>
+          <div class="task-summary-display"><%= h(@task['summary']) %></div>
+          <small>Summary cannot be edited. Use dstask edit <%= @task['id'] %> in terminal.</small>
+        <% end %>
+      </div>
+
+      <div class="form-group">
+        <label class="white-text">Project</label>
+        <select name="project" class="tui-input">
+          <option value="">None</option>
+          <% (@projects || []).each do |p| %>
+            <option value="<%= h(p['name']) %>" <%= @task['project'] == p['name'] ? 'selected' : '' %>><%= h(p['name']) %></option>
+          <% end %>
+        </select>
+        <% if @is_new %>
+          <small>Or type project:name in summary above</small>
+        <% end %>
+      </div>
+
+      <div class="form-group">
+        <label class="white-text">Priority</label>
+        <select name="priority" class="tui-input">
+          <% if @is_new %>
+            <option value="">Default (P2)</option>
+          <% else %>
+            <option value="">No change</option>
+          <% end %>
+          <option value="P0" <%= @task['priority'] == 'P0' ? 'selected' : '' %>>P0 (Critical)</option>
+          <option value="P1" <%= @task['priority'] == 'P1' ? 'selected' : '' %>>P1 (High)</option>
+          <option value="P2" <%= @task['priority'] == 'P2' ? 'selected' : '' %>>P2 (Normal)</option>
+          <option value="P3" <%= @task['priority'] == 'P3' ? 'selected' : '' %>>P3 (Low)</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="white-text">Tags</label>
+        <% current_tags = (@task['tags'] || []).join(', ') %>
+        <input type="text" name="tags" class="tui-input" value="<%= h(current_tags) %>" placeholder="tag1, tag2, tag3">
+        <small>Comma or space separated (without + prefix)</small>
+        <% unless @is_new %>
+          <input type="hidden" name="original_tags" value="<%= h(current_tags) %>">
+        <% end %>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="tui-button btn-submit"><%= @is_new ? 'Create Task' : 'Update Task' %></button>
+        <a href="/" class="tui-button btn-cancel">Cancel</a>
+      </div>
+    </form>
+  </fieldset>
+</div>

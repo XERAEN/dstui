@@ -1,0 +1,45 @@
+<div class="tui-window white-text dstui-panel" style="padding: 20px;">
+  <fieldset class="dstui-panel-border">
+    <legend class="center">PROJECTS</legend>
+
+    <% if @projects.empty? %>
+      <div style="text-align: center; padding: 40px; color: #888;">
+        No projects found
+      </div>
+    <% else %>
+      <div class="project-grid">
+        <% @projects.each do |project| %>
+          <%
+            total = project['taskCount'] || 0
+            resolved = project['resolvedCount'] || 0
+            open = total - resolved
+            progress = total > 0 ? (resolved.to_f / total * 100).round : 0
+          %>
+          <a href="/?project=<%= h(project['name']) %>" class="project-card">
+            <div class="project-header">
+              <span class="project-name"><%= h(project['name']) %></span>
+              <span class="project-priority <%= priority_class(project['priority']) %>"><%= project['priority'] %></span>
+            </div>
+
+            <div class="project-stats">
+              <span class="stat-open"><%= open %></span> open
+              <span style="color: #444;">|</span>
+              <span class="stat-done"><%= resolved %></span> done
+              <span style="color: #444;">|</span>
+              <span><%= total %></span> total
+            </div>
+
+            <div class="progress-bar">
+              <div class="progress-fill" style="width: <%= progress %>%;"></div>
+            </div>
+            <div class="progress-text"><%= progress %>% complete</div>
+          </a>
+        <% end %>
+      </div>
+    <% end %>
+
+    <div style="margin-top: 20px; color: #666;">
+      <%= @projects.length %> project<%= @projects.length == 1 ? '' : 's' %>
+    </div>
+  </fieldset>
+</div>
