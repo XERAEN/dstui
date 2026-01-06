@@ -16,14 +16,17 @@
 
       <div class="form-group">
         <label class="white-text">Project</label>
-        <select name="project" class="tui-input">
-          <option value="">None</option>
+        <input type="text" name="project" class="tui-input"
+               list="project-list"
+               value="<%= h(@task['project']) %>"
+               placeholder="Select or type new project name">
+        <datalist id="project-list">
           <% (@projects || []).each do |p| %>
-            <option value="<%= h(p['name']) %>" <%= @task['project'] == p['name'] ? 'selected' : '' %>><%= h(p['name']) %></option>
+            <option value="<%= h(p['name']) %>">
           <% end %>
-        </select>
+        </datalist>
         <% if @is_new %>
-          <small>Or type project:name in summary above</small>
+          <small>Type a new name to create a project, or select existing</small>
         <% end %>
       </div>
 
