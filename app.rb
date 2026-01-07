@@ -2,13 +2,27 @@
 
 require 'sinatra/base'
 require 'sinatra/contrib'
+require 'yaml'
 require_relative 'lib/dstask'
 
 module Dstui
+  CONFIG_PATH = File.join(__dir__, 'config.yml')
+  CONFIG = File.exist?(CONFIG_PATH) ? YAML.load_file(CONFIG_PATH) : {}
+
   class App < Sinatra::Base
     set :root, __dir__
     set :public_folder, -> { File.join(root, 'public') }
     set :views, -> { File.join(root, 'views') }
+
+    # Configure permitted hosts from config.yml
+    if CONFIG['permitted_hosts']
+      hosts = CONFIG['permitted_hosts']
+      if hosts == ['*'] || hosts == '*'
+        set :host_authorization, permitted_hosts: [/.*/]
+      else
+        set :host_authorization, permitted_hosts: Array(hosts)
+      end
+    end
 
     enable :sessions
     set :session_secret, ENV.fetch('SESSION_SECRET') { SecureRandom.hex(32) }
