@@ -1,0 +1,10 @@
+# Copy this file to config.yml and customize as needed
+
+# Permitted hosts for accessing the application
+# Without this setting, only localhost/127.0.0.1 are allowed
+permitted_hosts:
+  - localhost
+  - 127.0.0.1
+  - example.com
+  # Use "*" alone to allow all hosts (not recommended for production):
+  # - "*"
