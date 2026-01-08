@@ -151,6 +151,24 @@ module Dstui
       erb :runboard
     end
 
+    # Sync page
+    get '/sync' do
+      @sync_configured = !CONFIG['sync_script'].nil?
+      erb :sync
+    end
+
+    # Execute sync (AJAX endpoint)
+    post '/sync' do
+      content_type :json
+      result = Dstask.sync(CONFIG['sync_script'])
+      if result[:success]
+        { success: true, message: result[:message], stdout: result[:stdout], stderr: result[:stderr] }.to_json
+      else
+        status 422
+        { success: false, message: result[:message], stdout: result[:stdout], stderr: result[:stderr] }.to_json
+      end
+    end
+
     # New task form
     get '/tasks/new' do
       @task = {}
