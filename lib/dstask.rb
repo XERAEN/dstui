@@ -71,6 +71,22 @@ module Dstask
       run_write(id.to_s, ['remove'])
     end
 
+    def sync(script_path)
+      return { success: false, message: 'No sync script configured', stdout: '', stderr: '' } unless script_path
+
+      stdout, stderr, status = Open3.capture3(script_path, chdir: ENV['HOME'])
+      {
+        success: status.success?,
+        message: status.success? ? 'Sync completed' : 'Sync failed',
+        stdout: stdout,
+        stderr: stderr
+      }
+    rescue Errno::ENOENT
+      { success: false, message: "Sync script not found: #{script_path}", stdout: '', stderr: '' }
+    rescue Errno::EACCES
+      { success: false, message: "Sync script not executable: #{script_path}", stdout: '', stderr: '' }
+    end
+
     def modify(id, project: nil, priority: nil, add_tags: [], remove_tags: [])
       validate_id!(id)
       args = ['modify']

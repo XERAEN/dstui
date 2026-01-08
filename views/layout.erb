@@ -17,11 +17,12 @@
       </div>
 
       <nav style="display: flex; gap: 25px; align-items: center;">
-        <a href="/" class="nav-link <%= active_nav?('/') && !active_nav?('/active') && !active_nav?('/resolved') && !active_nav?('/projects') && !active_nav?('/runboard') && !active_nav?('/tasks') ? 'active' : '' %>">Tasks</a>
+        <a href="/" class="nav-link <%= active_nav?('/') && !active_nav?('/active') && !active_nav?('/resolved') && !active_nav?('/projects') && !active_nav?('/runboard') && !active_nav?('/tasks') && !active_nav?('/sync') ? 'active' : '' %>">Tasks</a>
         <a href="/runboard" class="nav-link <%= active_nav?('/runboard') ? 'active' : '' %>">Runboard</a>
         <a href="/active" class="nav-link <%= active_nav?('/active') ? 'active' : '' %>">Active</a>
         <a href="/resolved" class="nav-link <%= active_nav?('/resolved') ? 'active' : '' %>">Resolved</a>
         <a href="/projects" class="nav-link <%= active_nav?('/projects') ? 'active' : '' %>">Projects</a>
+        <a href="/sync" class="nav-link <%= active_nav?('/sync') ? 'active' : '' %>">Sync</a>
         <a href="/tasks/new" class="tui-button btn-new" style="padding: 2px 10px;">+ New</a>
       </nav>
     </div>

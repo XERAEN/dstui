@@ -1,0 +1,85 @@
+<div class="tui-window white-text dstui-panel" style="padding: 20px;">
+  <fieldset class="dstui-panel-border">
+    <legend class="center">SYNC</legend>
+
+    <% if @sync_configured %>
+      <div style="margin-bottom: 20px;">
+        <button type="button" id="sync-btn" class="tui-button btn-submit">Run Sync</button>
+        <span id="sync-status" style="margin-left: 10px;"></span>
+      </div>
+
+      <div id="sync-output" style="display: none;">
+        <div style="margin-bottom: 10px; color: #888;">Output:</div>
+        <pre id="sync-stdout" class="sync-output-pre"></pre>
+      </div>
+    <% else %>
+      <div style="text-align: center; padding: 40px; color: #888;">
+        No sync script configured.<br><br>
+        Add <code>sync_script: /path/to/script.sh</code> to config.yml
+      </div>
+    <% end %>
+  </fieldset>
+</div>
+
+<style>
+  .sync-output-pre {
+    background: #111;
+    border: 1px solid #333;
+    padding: 15px;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    max-height: 400px;
+    overflow-y: auto;
+    font-family: inherit;
+    color: #0f0;
+  }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var syncBtn = document.getElementById('sync-btn');
+  if (!syncBtn) return;
+
+  var statusEl = document.getElementById('sync-status');
+  var outputEl = document.getElementById('sync-output');
+  var stdoutEl = document.getElementById('sync-stdout');
+
+  syncBtn.addEventListener('click', function() {
+    syncBtn.disabled = true;
+    statusEl.textContent = 'Syncing...';
+    statusEl.style.color = '#ff0';
+    outputEl.style.display = 'none';
+
+    fetch('/sync', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      }
+    })
+    .then(function(response) {
+      return response.json();
+    })
+    .then(function(result) {
+      syncBtn.disabled = false;
+      outputEl.style.display = 'block';
+
+      if (result.success) {
+        statusEl.textContent = result.message;
+        statusEl.style.color = '#0f0';
+      } else {
+        statusEl.textContent = result.message;
+        statusEl.style.color = '#f66';
+      }
+
+      var output = [result.stdout, result.stderr].filter(function(s) { return s && s.trim(); }).join('\n');
+      stdoutEl.textContent = output || '(no output)';
+    })
+    .catch(function(err) {
+      syncBtn.disabled = false;
+      statusEl.textContent = 'Error: ' + err.message;
+      statusEl.style.color = '#f66';
+    });
+  });
+});
+</script>
